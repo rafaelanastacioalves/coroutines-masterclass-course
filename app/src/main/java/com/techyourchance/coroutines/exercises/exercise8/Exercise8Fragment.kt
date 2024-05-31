@@ -65,17 +65,26 @@ class Exercise8Fragment : BaseFragment() {
 
                 } catch (e: CancellationException) {
                     Log.d("Exercise8Fragment", "fetchingUsers - CancellationException")
-                    withContext(NonCancellable) {
-                        updateElapsedTimeJob.cancelAndJoin()
+                    try {
+                        withContext(NonCancellable) {
+                            updateElapsedTimeJob.cancelAndJoin()
+                        }
+
+                    }catch (e: CancellationException) {
+                        Log.d("Exercise8Fragment", "updateElapsedTimeJob.cancelAndJoin() - exception caught")
                     }
                     Log.d("Exercise8Fragment", "fetchingUsers - making elapsed time text empty")
                     txtElapsedTime.text = ""
                 } finally {
-
                     Log.d("Exercise8Fragment", "fetchingUsers - finally - enabling button")
-                    withContext(NonCancellable){
-                        btnFetch.isEnabled = true
+                    try {
+                        withContext(NonCancellable){
+                            btnFetch.isEnabled = true
+                        }
+                    }catch (e: CancellationException) {
+                        Log.d("Exercise8Fragment", "btnFetch.isEnabled = true - non cancellable exception caught")
                     }
+
                 }
             }
         }
