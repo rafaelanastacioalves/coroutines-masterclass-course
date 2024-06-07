@@ -53,14 +53,21 @@ class Exercise9Fragment : BaseFragment() {
             coroutineScope.launch {
                 try {
                     btnFetch.isEnabled = false
-                    fetchAndCacheUsersUseCase.fetchAndCacheUsers(userIds)
+                    val usersDeferred = async{ fetchAndCacheUsersUseCase.fetchAndCacheUsers(userIds) }
+                    val users = usersDeferred.await()
+                    bindUsers(users)
                     updateElapsedTimeJob.cancel()
                 } catch (e: CancellationException) {
-                    updateElapsedTimeJob.cancelAndJoin()
-                    txtElapsedTime.text = ""
-                    txtUsers.text = ""
+                    withContext(NonCancellable) {
+                        updateElapsedTimeJob.cancelAndJoin()
+                        txtElapsedTime.text = ""
+                        txtUsers.text = ""
+                    }
+
                 } finally {
-                    btnFetch.isEnabled = true
+                    withContext(NonCancellable) {
+                        btnFetch.isEnabled = true
+                    }
                 }
             }
         }
